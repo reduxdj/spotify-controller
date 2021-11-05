@@ -1,0 +1,233 @@
+(* Script to record and tag spotify tracks, by Lloyd Moore *)
+(* Modified by Tiffany G. Wilson to resolve audio splitting issues, automate starting/stopping, and add recording customization *)
+(* Modified by alexandre229 to resolve the latency of Spotify to update the player state status *)
+(* Snippets for controlling Spotify are from Johnny B on tumblr (http://johnnyb.tumblr.com/post/25716608379/spotify-offline-playlist) *)
+(* The idea of using delayed tagging/filename updating is from a guest user on pastebin (http://pastebin.com/rHqY0qg9) *)
+(* The only thing to change in the script is the output format; you must change the file extension and the recording format to match *)
+(* Run this script once a song you want to record is queued (stopped at beginning) or playing *)
+(* Running the script will initiate hijacking, recording and audio playback *)
+(* To stop script, pause Spotify or wait for album/playlist to end*)
+(* To set id3 tags, use application Kid3 (http://sourceforge.net/projects/kid3/) and copy '%{artist} - %{album} - %{track} - %{title}' from file name to Tag 2 *)
+
+set output_folder to (choose folder with prompt "Please choose an output directory")
+set folder_path to POSIX path of output_folder
+
+property file_extension : ".mp3"
+-- property file_extension : ".m4a" (* If format is changed to AAC *)
+
+property check_delay : 0.1 (* How often to check for a new track *)
+property write_delay : 2 (* How long to wait before updating file name *)
+property stop_delay : 1 (* How long to wait before updating final file after playback stops *)
+
+set track_counter to 1
+
+tell application "Spotify"
+	if player state is playing then pause
+end tell
+
+tell application "Audio Hijack Pro"
+	activate
+	set theSession to my getSession()
+	tell theSession
+		-- Recording file settings
+		set output folder to output_folder
+		set output name format to "%tag_title"
+		set title tag to track_counter
+
+		-- Audio format settings
+		set recording format to {encoding:MP3, bit rate:256, channels:Stereo, style:VBR}
+		--set recording format to {encoding:AAC, bit rate:256, channels:Stereo}
+	end tell
+
+	if hijacked of theSession is false then start hijacking theSession
+	start recording theSession
+end tell
+
+set track_counter to (track_counter + 1)
+
+tell application "Spotify"
+	-- Start playing Spotify from beginning of current track
+	set player position to 0
+	play
+
+	set track_name to (name of current track)
+	set track_artist to (artist of current track)
+	set track_album to (album of current track)
+	set track_number to (track number of current track)
+
+	-- Add delay for resolve 1s recording and stop problem
+	delay 1
+
+	repeat until player state is not playing
+		-- On change of track
+		if track_name is not equal to (name of current track) then
+			tell application "Audio Hijack Pro"
+				tell theSession
+					set title tag to track_counter
+					split recording
+				end tell
+			end tell
+
+			delay write_delay
+
+			-- Update the file name from track_counter.mp3 to artist - ... - track.mp3
+			my update_filename(track_counter - 1, track_artist, track_name, track_album, track_number, folder_path)
+			set track_counter to (track_counter + 1)
+
+			-- Get new track data
+			set track_name to name of current track
+			set track_artist to artist of current track
+			set track_album to album of current track
+			set track_number to track number of current track
+		end if
+		delay check_delay
+	end repeat
+
+	-- Stop recording and edit final file name once playback has stopped
+	delay stop_delay
+	tell application "Audio Hijack Pro"
+		stop recording theSession
+		stop hijacking t(* Script to record and tag spotify tracks, by Lloyd Moore *)
+(* Modified by Tiffany G. Wilson to resolve audio splitting issues, automate starting/stopping, and add recording customization *)
+(* Modified by alexandre229 to resolve the latency of Spotify to update the player state status *)
+(* Snippets for controlling Spotify are from Johnny B on tumblr (http://johnnyb.tumblr.com/post/25716608379/spotify-offline-playlist) *)
+(* The idea of using delayed tagging/filename updating is from a guest user on pastebin (http://pastebin.com/rHqY0qg9) *)
+(* The only thing to change in the script is the output format; you must change the file extension and the recording format to match *)
+(* Run this script once a song you want to record is queued (stopped at beginning) or playing *)
+(* Running the script will initiate hijacking, recording and audio playback *)
+(* To stop script, pause Spotify or wait for album/playlist to end*)
+(* To set id3 tags, use application Kid3 (http://sourceforge.net/projects/kid3/) and copy '%{artist} - %{album} - %{track} - %{title}' from file name to Tag 2 *)
+
+set output_folder to (choose folder with prompt "Please choose an output directory")
+set folder_path to POSIX path of output_folder
+
+property file_extension : ".mp3"
+-- property file_extension : ".m4a" (* If format is changed to AAC *)
+
+property check_delay : 0.1 (* How often to check for a new track *)
+property write_delay : 2 (* How long to wait before updating file name *)
+property stop_delay : 1 (* How long to wait before updating final file after playback stops *)
+
+set track_counter to 1
+
+tell application "Spotify"
+	if player state is playing then pause
+end tell
+
+tell application "Audio Hijack Pro"
+	activate
+	set theSession to my getSession()
+	tell theSession
+		-- Recording file settings
+		set output folder to output_folder
+		set output name format to "%tag_title"
+		set title tag to track_counter
+
+		-- Audio format settings
+		set recording format to {encoding:MP3, bit rate:256, channels:Stereo, style:VBR}
+		--set recording format to {encoding:AAC, bit rate:256, channels:Stereo}
+	end tell
+
+	if hijacked of theSession is false then start hijacking theSession
+	start recording theSession
+end tell
+
+set track_counter to (track_counter + 1)
+
+tell application "Spotify"
+	-- Start playing Spotify from beginning of current track
+	set player position to 0
+	play
+
+	set track_name to (name of current track)
+	set track_artist to (artist of current track)
+	set track_album to (album of current track)
+	set track_number to (track number of current track)
+
+	-- Add delay for resolve 1s recording and stop problem
+	delay 1
+
+	repeat until player state is not playing
+		-- On change of track
+		if track_name is not equal to (name of current track) then
+			tell application "Audio Hijack Pro"
+				tell theSession
+					set title tag to track_counter
+					split recording
+				end tell
+			end tell
+
+			delay write_delay
+
+			-- Update the file name from track_counter.mp3 to artist - ... - track.mp3
+			my update_filename(track_counter - 1, track_artist, track_name, track_album, track_number, folder_path)
+			set track_counter to (track_counter + 1)
+
+			-- Get new track data
+			set track_name to name of current track
+			set track_artist to artist of current track
+			set track_album to album of current track
+			set track_number to track number of current track
+		end if
+		delay check_delay
+	end repeat
+
+	-- Stop recording and edit final file name once playback has stopped
+	delay stop_delay
+	tell application "Audio Hijack Pro"
+		stop recording theSession
+		stop hijacking theSession
+	end tell
+	my update_filename(track_counter - 1, track_artist, track_name, track_album, track_number, folder_path)
+end tell
+
+
+-- Update file name so it can be tagged using Kid3
+on update_filename(track_counter, track_artist, track_name, track_album, track_number, folder_path)
+	set old_file to ("\"" & folder_path & track_counter & file_extension & "\"")
+	set new_file to ("\"" & folder_path & track_artist & " - " & track_album & " - " & track_name & file_extension & "\"")
+	do shell script ("mv " & old_file & " " & new_file)
+end update_filename
+
+-- Set Spotify session in Audio Hijack Pro
+on getSession()
+	tell application "Audio Hijack Pro"
+		set sessionName to "Spotify"
+		try
+			set theSession to (first item of (every session whose name is sessionName))
+			theSession is not null
+		on error
+			set theSession to (make new application session at end of sessions)
+			set name of theSession to sessionName
+		end try
+	end tell
+	return theSession
+end getSession
+
+heSession
+	end tell
+	my update_filename(track_counter - 1, track_artist, track_name, track_album, track_number, folder_path)
+end tell
+
+
+-- Update file name so it can be tagged using Kid3
+on update_filename(track_counter, track_artist, track_name, track_album, track_number, folder_path)
+	set old_file to ("\"" & folder_path & track_counter & file_extension & "\"")
+	set new_file to ("\"" & folder_path & track_artist & " - " & track_album & " - " & track_name & file_extension & "\"")
+	do shell script ("mv " & old_file & " " & new_file)
+end update_filename
+
+-- Set Spotify session in Audio Hijack Pro
+on getSession()
+	tell application "Audio Hijack Pro"
+		set sessionName to "Spotify"
+		try
+			set theSession to (first item of (every session whose name is sessionName))
+			theSession is not null
+		on error
+			set theSession to (make new application session at end of sessions)
+			set name of theSession to sessionName
+		end try
+	end tell
+	return theSession
+end getSession

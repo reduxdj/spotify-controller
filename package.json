@@ -1,0 +1,31 @@
+{
+  "name": "SpotifyController",
+  "version": "1.2.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+    "start": "CLIENT_ID=0e9a13e08dc94908b40d576511a2cc78 CLIENT_SECRET=0b600e1c439147bba47dab7a1e23bbbb node ./spotify_controller.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "moduleRoots": [
+    "./"
+  ],
+  "dependencies": {
+    "axios": "^0.21.4",
+    "node-id3": "^0.2.3",
+    "yargs": "^17.2.1"
+  },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint-config-airbnb": "^18.2.1"
+  }
+}
