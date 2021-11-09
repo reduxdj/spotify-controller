@@ -19,7 +19,7 @@ const apiHelp = () =>
               toggle repeat                # Toggles repeat playback mode.
               help                         # Shows help.
 
-            **  The following commands only worth with Audiou Hijack Pro, which only runs on Yoesmeite 10.10
+            **  The following commands only worth with Audio Hijack Pro, which only runs on Yoesmeite 10.10
               record <album|playlist|track> # Records a song, album, or playlist by URI or URL
               `;
 
@@ -52,7 +52,6 @@ async function start() {
           } else {
               console.log(await sc.getCurrentVolume());
           }
-
       }
       if (arg1 === 'info'){
         console.log(await sc.getCurrentTrackInfo());
