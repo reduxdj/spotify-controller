@@ -6,34 +6,40 @@ const apiHelp = () =>
           <command>
             Commands:
               play                         # Resumes playback where Spotify last left off.
-              play <URL|spotify URI>             # Finds a song by name and plays it.
-              play album <album name>      # Finds an album by name and plays it.
-              play artist <artist name>    # Finds an artist by name and plays it.
-              play list <playlist name>    # Finds a playlist by name and plays it.
+              play <album|playlist|track>  # Plays a song, album, or playlist by URI or URL
               next                         # Skips to the next song in a playlist.
               prev                         # Returns to the previous song in a playlist.
               replay                       # Replays the current track from the beginning.
               pos <time>                   # Jumps to a time (in secs) in the current song.
               pause                        # Pauses (or resumes) Spotify playback.
               stop                         # Stops playback.
-              quit                         # Stops playback and quits Spotify.
-              vol up                       # Increases the volume by 10%.
-              vol down                     # Decreases the volume by 10%.
               vol <amount>                 # Sets the volume to an amount between 0 and 100.
-              vol [show]                   # Shows the current Spotify volume.";
-              status                       # Shows the current player status.
               info                         # Shows Info about the current track.
               toggle shuffle               # Toggles shuffle playback mode.
               toggle repeat                # Toggles repeat playback mode.
-              help                         # Shows help.`;
+              help                         # Shows help.
+
+            **  The following commands only worth with Audiou Hijack Pro, which only runs on Yoesmeite 10.10
+              record <album|playlist|track> # Records a song, album, or playlist by URI or URL
+              `;
 
 const isCommandLine = require.main.filename.includes('command_controller.sh')
 async function start() {
     if (isCommandLine) {
       const [arg1, arg2, arg3] = process.argv.slice(2);
+      if (arg1 === 'record') {
+        if (arg3) {
+            await sc.record(arg3, arg2);
+        } else if (arg2) {
+            await sc.record(arg2);
+        } else {
+            await sc.record();
+        }
+      }
+
       if (arg1 === 'play') {
         if (arg3) {
-            await sc.play(arg3, arg3);
+            await sc.play(arg3, arg2);
         } else if (arg2) {
             await sc.play(arg2);
         } else {
@@ -68,11 +74,12 @@ async function start() {
           sc.next()
       }
       if (arg1 === 'prev'){
-          sc.previous();
+          await sc.setPosition(0);
+          await sc.previous();
       }
       if (arg1 === 'replay'){
-          sc.previous();
-          sc.setPosition(0);
+          await sc.previous();
+          await sc.setPosition(0);
       }
     }
 }

@@ -37,7 +37,7 @@ const getTrackInfo = () => `tell application "Spotify"
     set info to info & "&repeating=" & repeating
 end tell`;
 
-const transformFromObjectToStringAndStripQuotes = (obj) => util.inspect(o).replace(/bitRate/g, 'bit rate');
+const transformFromObjectToStringAndStripQuotes = (obj) => util.inspect(obj).replace(/bitRate/g, 'bit rate');
 
 const parsePrimitive = (s = '') => {
   if (s.match(/^\d*(\.\d+)?$/)) return Number(s);
@@ -45,7 +45,9 @@ const parsePrimitive = (s = '') => {
   return s;
 };
 
-const delay = (int) => new Promise((resolve) => setTimeout(() => resolve()), int);
+const delay = async (intSeconds, f = () => {}) => new Promise((resolve) => setTimeout(() => {
+  resolve(f())
+}, intSeconds));
 
 const infoToTag = ({ album, title, artist, durationSeconds }) => {
   return { album, title: track, album, time: durationSeconds };
@@ -61,13 +63,14 @@ const parseQuery = (query = '') => {
 const parseSpotifyUrl = (url = '') => {
   const uri = url
     .replace(/https:\/\//g, '')
-    .replace(/\?si=\d+/)
+    .replace(/\?si=\d+/, '')
     .replace(/\?si=\w+/, '');
   const parts = uri.split('/');
   return { id: parts[2], type: parts[1] };
 };
 
 module.exports = {
+  delay,
   getTrackInfo,
   parseQuery,
   parseSpotifyUrl,

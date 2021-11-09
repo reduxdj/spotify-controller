@@ -216,18 +216,3 @@ on update_filename(track_counter, track_artist, track_name, track_album, track_n
 	set new_file to ("\"" & folder_path & track_artist & " - " & track_album & " - " & track_name & file_extension & "\"")
 	do shell script ("mv " & old_file & " " & new_file)
 end update_filename
-
--- Set Spotify session in Audio Hijack Pro
-on getSession()
-	tell application "Audio Hijack Pro"
-		set sessionName to "Spotify"
-		try
-			set theSession to (first item of (every session whose name is sessionName))
-			theSession is not null
-		on error
-			set theSession to (make new application session at end of sessions)
-			set name of theSession to sessionName
-		end try
-	end tell
-	return theSession
-end getSession
