@@ -132,7 +132,7 @@ class SpotifyController {
   _expiration;
   setToken(data) {
     this._token = data.access_token;
-    this._expiration = date.now + data.expires_in * 1000;
+    this._expiration = Date.now() + data.expires_in * 1000;
   }
   _currentTrackInfo = {};
   async getCurrentTrackInfo(outputToConsole) {
